@@ -1,0 +1,2 @@
+flight_dynamics
+-DCATKIN_DEVEL_PREFIX=/home/magiccjae/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/magiccjae/catkin_ws/install -G Unix Makefiles

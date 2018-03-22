@@ -1,0 +1,8 @@
+prefix=/home/magiccjae/catkin_ws/devel
+
+Name: flight_dynamics
+Description: Description of flight_dynamics
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/magiccjae/catkin_ws/devel/lib 
+Requires: 
