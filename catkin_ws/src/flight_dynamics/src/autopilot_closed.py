@@ -27,10 +27,10 @@ state_est =  [[0.0],[0.0],[0.0],[0.0],[0.0],[0.0],[0.0],[0.0],[0.0],[0.0],[0.0],
 gusts = [[0.0],[0.0],[0.0]]
 course_est = 0.0
 err_int_course = 0.0
-
+phic = 0.0
 beta = 0.0
 alpha = 0.0
-closed_loop = 1.0
+closed_loop = 0.0
 
 def start_funct():
     global param,time_old,inp, state, V_a, abp, pub_f, pub_pos, pub_vel, pub_att, pub_att_v, pub_acc, pub_att_a, pub_va, pub_course, course
@@ -56,6 +56,7 @@ def start_funct():
     # rospy.Subscriber("/ekf_pilot/states_clean_att_a",Vector3,)
     # rospy.Subscriber("/ekf_pilot/states_clean_va",Float32,update)
     rospy.Subscriber("/ekf_pilot/states_clean_course",Float32,update_course_est)
+    rospy.Subscriber("/flight_dynamics/phi", Float32, update_phi)
 
 
     pub_f = rospy.Publisher("/autopilot/states_clean_forces",Vector3,queue_size=10)
@@ -84,6 +85,13 @@ def start_funct():
     dynamics_rate = rospy.get_param('~rate', 100.0)
     rospy.Timer(rospy.Duration(1.0/dynamics_rate), dynamics_timer_callback)
     rospy.spin()
+
+def wrap(a):
+    while a > np.pi:
+        a = a - 2*np.pi
+    while a < -np.pi:
+        a = a + 2*np.pi
+    return a
 
 def update_pos(msg):
      global state_est
@@ -126,7 +134,9 @@ def update_va(msg):
 def update_course(msg):
      global inp_
      inp_[2][0] = msg.data
-
+def update_phi(msg):
+     global phic
+     phic = msg.data
 #def update_del_t(msg):
 #     global inp_
 #     inp_[3][0] = msg.data
@@ -176,13 +186,13 @@ def pid_calculate_command():
     set_del_e_t(h_c,va_c)
 
 def set_del_a_r(course_c):
-    global state, inp, param, V_a, beta, alpha, course, wind, err_int_course, state_est, course_est, closed_loop
+    global state, inp, param, V_a, beta, alpha, course, wind, err_int_course, state_est, course_est, closed_loop, phic
 
     del_a_max = 3.14/9.0/2.0
     e_phi_max = 3.14/6.0
     zeta_phi = 0.85
-    W_course = 5.0
-    zeta_course = 0.8
+    W_course = 7.0
+    zeta_course = 0.85
     i = np.copy(inp)
     kp_phi = del_a_max/e_phi_max
     omega_phi = np.sqrt(kp_phi)
@@ -206,18 +216,18 @@ def set_del_a_r(course_c):
     ki_course = 0.1
     if r < 0.1:
         err_int_course = err_int_course + 0.01/2.0*(course_c - course)
-    phi_c = kp_course*(course_c - course) + ki_course*(err_int_course)
-    phi_c_temp = np.sign(kp_course*(course_c - course) + ki_course*(err_int_course))*min(np.sign(kp_course*(course_c - course) + ki_course*(err_int_course))*\
-                (kp_course*(course_c - course) + ki_course*(err_int_course)),phi_max)
+    phi_c = kp_course*(course_c - course) + ki_course*(err_int_course) + phic
+    phi_c_temp = np.sign(kp_course*(course_c - course) + ki_course*(err_int_course)+ phic)*min(np.sign(kp_course*(course_c - course) + ki_course*(err_int_course)+ phic)*\
+                (kp_course*(course_c - course) + ki_course*(err_int_course)+ phic),phi_max)
     err_int_course = err_int_course + 0.01/ki_course*(phi_c_temp - phi_c)
-    # course = s[8][0] + beta
-    # print "psi", psi
-    # print "va", V_a
-    # print "vn",Vn
-    # print "ve",Ve
-    # print "wind", wind
-    # print "course", course
-    phi_c = kp_course*(course_c - course) + ki_course*(err_int_course)
+    phi_c = np.sign(kp_course*(course_c - course) + ki_course*(err_int_course) + phic)*min(np.sign(kp_course*(course_c - course) + ki_course*(err_int_course)+ phic)*\
+                (kp_course*(course_c - course) + ki_course*(err_int_course)+ phic),phi_max)
+
+
+
+    # phi_c = np.sign(kp_course*(course_c - course) + phic)*min(np.sign(kp_course*(course_c - course) + phic)*\
+    #             (kp_course*(course_c - course) + phic),phi_max)
+
     i[0][0] = np.sign(kp_phi*(phi_c - s[6][0]) - kd_phi*(s[9][0]))*min(np.sign(kp_phi*(phi_c - s[6][0]) - kd_phi*(s[9][0]))*(kp_phi*(phi_c - s[6][0])\
                 - kd_phi*(s[9][0])),del_a_max)
     i[2][0] = np.sign(-kp_psi*(beta))*min(np.sign(-kp_psi*(beta))*(-kp_psi*(beta)),del_r_max)
@@ -238,7 +248,7 @@ def set_del_e_t(h_c, va_c):
     W_h = 8.0
     zeta_h = 0.8
     W_va = 20.0
-    zeta_va = 0.707
+    zeta_va = 0.8
     omega_t = 2.0
     zeta_t = 0.8
     h_hold = 50
@@ -292,7 +302,7 @@ def set_del_e_t(h_c, va_c):
     # print kp_theta, kd_theta
     i[1][0] = np.sign(kp_theta*(theta_c - s[7][0]) + kd_theta*(s[10][0]))*min(np.sign(kp_theta*\
                 (theta_c - s[7][0]) + kd_theta*(s[10][0]))*(kp_theta*(theta_c - s[7][0]) + kd_theta*(s[10][0])),del_e_max)
-    # state = np.copy(s)
+    state = np.copy(s)
     inp = np.copy(i)
     # print "inp", inp
 
@@ -466,6 +476,9 @@ def propagate(dt):
     # pub_wind.publish(wind)
     s += temp
 
+    s[6][0] = wrap(s[6][0])
+    s[7][0] = wrap(s[7][0])
+    s[8][0] = wrap(s[8][0])
     state = np.copy(s)
     # exit()
     # print state, "state after dynamics and fixing trim"

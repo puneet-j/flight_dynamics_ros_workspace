@@ -7,4 +7,4 @@
 # new environment variables
 
 # modified environment variables
-export PWD="/home/magiccjae/catkin_ws/build"
+export PWD="/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/build"

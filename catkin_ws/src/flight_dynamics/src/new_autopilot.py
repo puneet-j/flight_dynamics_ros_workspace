@@ -38,9 +38,10 @@ bh = 0.1
 bchi = 0.1
 bchidot = 0.1
 bhdot = 0.1
+phic = 0.1
 # time_old =  rospy.Time.now().to_sec()
 def start_funct():
-    global param,time_old,inp, state, V_a, abp, pub_f, pub_pos, pub_vel, pub_att, pub_att_v, pub_acc, pub_att_a, pub_va, pub_course, course
+    global param,time_old,state, pub_h, pub_va, pub_chi, pub_pos, pub_att
     # initialize member variables
     # print "do i get here?"
     # get parameters
@@ -55,6 +56,13 @@ def start_funct():
     #course = 0.0
     time_old = rospy.Time.now().to_sec()
 
+    pub_h =  rospy.Publisher("/new_autopilot/h_", Float32, queue_size=10)
+    pub_va =  rospy.Publisher("/new_autopilot/va_", Float32, queue_size=10)
+    pub_chi =  rospy.Publisher("/new_autopilot/chi_", Float32, queue_size=10)
+
+    pub_pos = rospy.Publisher("/autopilot/states_clean_pos",Vector3,queue_size=10)
+    pub_att = rospy.Publisher("/autopilot/states_clean_att",Vector3,queue_size=10)
+
 
     rospy.Subscriber("/flight_dynamics/bchidot", Float32, update_bchidot)
     rospy.Subscriber("/flight_dynamics/bchi", Float32, update_bchi)
@@ -65,13 +73,14 @@ def start_funct():
     rospy.Subscriber("/flight_dynamics/h", Float32, update_h)
     rospy.Subscriber("/flight_dynamics/va", Float32, update_va)
     rospy.Subscriber("/flight_dynamics/course", Float32, update_course)
+    rospy.Subscriber("/flight_dynamics/phi", Float32, update_phi)
 
     dynamics_rate = rospy.get_param('~rate', 100.0)
     rospy.Timer(rospy.Duration(1.0/dynamics_rate), dynamics_timer_callback)
     rospy.spin()
 
 def propagate(dt):
-    global state,psi,chi_old,hc_old,h_old,inp_,chi_c_old
+    global state,psi,chi_old,hc_old,h_old,inp_,chi_c_old, pub_pos, pub_att
     s = np.copy(state)
     # t0 +=dt
     # print state, "state starting dynamics"
@@ -87,15 +96,35 @@ def propagate(dt):
     # s_dot_vec = np.copy(temp)
     s += temp
     s[3][0] = wrap(s[3][0])
-    #exit()
-    #chi_old = wrap(s[3][0])
+
+    pos = Vector3()
+    att = Vector3()
+
+    pos.x = s[0][0]
+    pos.y = s[1][0]
+    pos.z = s[2][0]
+
+    att.x = 0.0#s[6][0]
+    att.y = 0.0#s[7][0]
+    att.z = s[3][0] #phi
+    pub_pos.publish(pos)
+    pub_att.publish(att)
+
     hc_old = inp_[0][0]
-    #h_old = -s[2][0]
     chi_c_old = inp_[2][0]
     state = np.copy(s)
 
 def dynamics(s):
-    global state,psi,chi_old,hc_old,h_old,inp_,chi_c_old, bh, bva, bhdot, bchidot, bchi
+    global state,psi,chi_old,hc_old,h_old,inp_,chi_c_old, bh, bva, bhdot, bchidot, bchi, phic
+
+    #values found from tuning using sliders
+    bchi = 0.078
+    bchidot = 0.64
+    bh = 0.4
+    bhdot = -1.5
+    bva = 0.84
+    g = 9.81
+
     m= param['m']
     Jx = param['Jx']
     Jy = param['Jy']
@@ -111,7 +140,9 @@ def dynamics(s):
     h = -s[2][0]
     chi = wrap(s[3][0])
     #print(h,h_dot)
-    chi_c_dot = wrap(inp_[2][0] - chi_c_old)
+
+    tphic = np.sin(phic)/np.cos(phic)
+    chi_c_dot = g/(V_a)*tphic#wrap(inp_[2][0] - chi_c_old)
     hc_dot = inp_[0][0] - hc_old
     #if inp_[1][0] == 0:
     #    inp_[1][0] = 0.001
@@ -129,14 +160,7 @@ def dynamics(s):
     state_dot[4][0] = bva*(inp_[1][0]-V_a)
     state_dot[5][0] = bchidot*(chi_c_dot-chi_dot) + bchi*(inp_[2][0] - chi)
     state_dot[6][0] = -(bhdot*(hc_dot - h_dot) +  bh*(inp_[0][0] - h))
-    print (chi_c_dot-chi_dot, inp_[2][0] - chi, chi)
-    # if chi_c_dot != 0.0:
-    #     print(chi_c_dot, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    # else:
-    #     print("chi, chi_dot, chi_c, chi_c_dot, sat chi_dot, sat chi_dot_dot, V_a, h")
-    #     print(chi,chi_dot, inp_[2][0], chi_c_dot, state_dot[3][0], state_dot[5][0], V_a, h)
-    #state_dot[7][0] = chi_c_dot
-    #state_dot[8][0] = hc_dot
+
     s2 = state_dot.copy()
     return s2
 
@@ -162,6 +186,7 @@ def wrap(a):
 def update_h(msg):
      global inp_
      inp_[0][0] = msg.data
+
 def update_va(msg):
      global inp_
      inp_[1][0] = msg.data
@@ -170,6 +195,9 @@ def update_course(msg):
      global inp_
      inp_[2][0] = msg.data
 
+def update_phi(msg):
+     global phic
+     phic = msg.data
 
 
 def update_bh(msg):
@@ -194,7 +222,7 @@ def update_bhdot(msg):
 
 
 def dynamics_timer_callback(self):
-    global state,psi, time_old
+    global state,psi, time_old, pub_h, pub_va, pub_chi
     # print "dynamics timer callback"
     # propagate dynamics
     time = rospy.Time.now()
@@ -212,7 +240,9 @@ def dynamics_timer_callback(self):
     # q4 = tf.transformations.quaternion_from_euler(s[6],s[7],s[8],'sxyz')
     #if psi == 0:
     #    psi = 0.001
-
+    pub_h.publish(-s[2][0])
+    pub_va.publish(s[4][0])
+    pub_chi.publish(s[3][0])
     q4 = tf.transformations.quaternion_from_euler(0.,0.,psi,'sxyz')
     # print psi, "quat", q1,q4
 
@@ -224,7 +254,7 @@ def dynamics_timer_callback(self):
 
 
 if __name__ == '__main__':
-    rospy.init_node('autopilot')
+    rospy.init_node('new_autopilot')
     br = TransformBroadcaster()
     try:
         start_funct()

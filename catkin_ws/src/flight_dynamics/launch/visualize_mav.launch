@@ -14,10 +14,15 @@
   <!-- <node pkg="flight_dynamics" name="flight_dynamics" type="flight_dynamics.py" output="screen"/> -->
   <!-- <node pkg="flight_dynamics" name="forces" type="forces.py" output="screen"/> -->
   <!-- <node pkg="flight_dynamics" name="trim" type="trim.py" output="screen"/> -->
-  <!-- <node pkg="flight_dynamics" name="new_autopilot" type="new_autopilot.py" output="screen"/> -->
-  <node pkg="flight_dynamics" name="new_autopilot_phi" type="new_autopilot_phi.py" output="screen"/>
+  <node pkg="flight_dynamics" name="autopilot_closed" type="autopilot_closed.py" output="screen"/>
+  <!-- <node pkg="flight_dynamics" name="autopilot_phi" type="autopilot_phi.py" output="screen"/>-->
 
   <!-- <node pkg="flight_dynamics" name="autopilot" type="autopilot.py" output="screen"/> -->
+  <!-- <node pkg="flight_dynamics" name="new_autopilot" type="new_autopilot.py" output="screen"/> -->
+  <node pkg="flight_dynamics" name="path_follower" type="path_follower.py" output="screen"/>
+
+  <!-- <node pkg="flight_dynamics" name="new_autopilot_phi" type="new_autopilot_phi.py" output="screen"/> -->
+
   <!-- <node pkg="flight_dynamics" name="sensors" type="sensors.py" output="screen"/> -->
   <!-- <node pkg="flight_dynamics" name="ekf_pilot_2" type="ekf_pilot_2.py" output="screen"/> -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />

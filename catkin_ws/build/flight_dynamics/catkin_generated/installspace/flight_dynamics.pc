@@ -1,8 +1,8 @@
-prefix=/home/magiccjae/catkin_ws/install
+prefix=/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/install
 
 Name: flight_dynamics
 Description: Description of flight_dynamics
 Version: 0.0.0
 Cflags: 
-Libs: -L/home/magiccjae/catkin_ws/install/lib 
+Libs: -L/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/install/lib 
 Requires: 

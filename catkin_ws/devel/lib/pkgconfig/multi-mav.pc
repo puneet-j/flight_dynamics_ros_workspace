@@ -1,0 +1,8 @@
+prefix=/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/devel
+
+Name: multi-mav
+Description: Description of multi-mav
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/devel/lib 
+Requires: 

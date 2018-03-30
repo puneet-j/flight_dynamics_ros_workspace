@@ -1,0 +1,14 @@
+publish_interval: 100
+settings:
+  /flight_dynamics/bchi/data: {is_repeat: false, max: 0.1, min: -0.1}
+  /flight_dynamics/bchidot/data: {is_repeat: false, max: 0.1, min: -0.1}
+  /flight_dynamics/bh/data: {is_repeat: false, max: 5.0, min: -5.0}
+  /flight_dynamics/bhdot/data: {is_repeat: false, max: 5.0, min: -5.0}
+  /flight_dynamics/bphi/data: {is_repeat: false, max: 1.0, min: -1.0}
+  /flight_dynamics/bva/data: {is_repeat: false, max: 1.0, min: -1.0}
+  /flight_dynamics/course/data: {is_repeat: false, max: 1.0, min: -1.0}
+  /flight_dynamics/h/data: {is_repeat: false, max: 1000.0, min: -1.0}
+  /flight_dynamics/va/data: {is_repeat: false, max: 50.0, min: -1.0}
+texts: [/flight_dynamics/h/data, /flight_dynamics/va/data, /flight_dynamics/course/data,
+  /flight_dynamics/bchi/data, /flight_dynamics/bchidot/data, /flight_dynamics/bh/data,
+  /flight_dynamics/bhdot/data, /flight_dynamics/bphi/data, /flight_dynamics/bva/data]

@@ -1,8 +1,8 @@
-# Install script for directory: /home/magiccjae/catkin_ws/src/flight_dynamics
+# Install script for directory: /home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/src/flight_dynamics
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/magiccjae/catkin_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -33,17 +33,17 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/magiccjae/catkin_ws/build/flight_dynamics/catkin_generated/installspace/flight_dynamics.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/build/flight_dynamics/catkin_generated/installspace/flight_dynamics.pc")
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/flight_dynamics/cmake" TYPE FILE FILES
-    "/home/magiccjae/catkin_ws/build/flight_dynamics/catkin_generated/installspace/flight_dynamicsConfig.cmake"
-    "/home/magiccjae/catkin_ws/build/flight_dynamics/catkin_generated/installspace/flight_dynamicsConfig-version.cmake"
+    "/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/build/flight_dynamics/catkin_generated/installspace/flight_dynamicsConfig.cmake"
+    "/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/build/flight_dynamics/catkin_generated/installspace/flight_dynamicsConfig-version.cmake"
     )
 endif()
 
 if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/flight_dynamics" TYPE FILE FILES "/home/magiccjae/catkin_ws/src/flight_dynamics/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/flight_dynamics" TYPE FILE FILES "/home/puneet2895/flight_dynamics_ros_workspace/catkin_ws/src/flight_dynamics/package.xml")
 endif()
 

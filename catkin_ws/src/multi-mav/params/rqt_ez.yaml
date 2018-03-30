@@ -1,0 +1,9 @@
+publish_interval: 100
+settings:
+  /flight_dynamics/posx/data: {is_repeat: true, max: 20.0, min: -20.0}
+  /flight_dynamics/posy/data: {is_repeat: true, max: 20.0, min: -20.0}
+  /flight_dynamics/posz/data: {is_repeat: true, max: 20.0, min: -20.0}
+  /flight_dynamics/torx/data: {is_repeat: true, max: 3.14, min: -3.14}
+  /flight_dynamics/tory/data: {is_repeat: true, max: 3.14, min: -3.14}
+  /flight_dynamics/torz/data: {is_repeat: true, max: 3.14, min: -3.14}
+texts: [N,E,D,R,P,Y]

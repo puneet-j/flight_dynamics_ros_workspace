@@ -1,0 +1,20 @@
+<launch>
+
+  <arg name="model" default="$(find multi-mav)/urdf/mav.urdf"/>
+  <!-- <arg name="rvizconfig" default="$(find multi-mav)/rviz/mav.rviz" /> -->
+  <rosparam command="load" file="$(find multi-mav)/params/params.yaml" ns="multi-mav" />
+
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <node name="sliders" pkg="rqt_ez_publisher" type="rqt_ez_publisher"/>
+
+  <!-- <node pkg="multi-mav" name="trim" type="trim.py" output="screen"/> -->
+
+  <node pkg="multi-mav" name="autopilot" type="autopilot.py" output="screen"/>
+  <node pkg="multi-mav" name="new_autopilot" type="new_autopilot.py" output="screen"/>
+  <node pkg="multi-mav" name="new_autopilot_phi" type="new_autopilot_phi.py" output="screen"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>

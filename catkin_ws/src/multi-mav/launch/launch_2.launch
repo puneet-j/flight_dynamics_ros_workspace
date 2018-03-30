@@ -1,0 +1,15 @@
+<launch>
+
+  <arg name="model" default="$(find flight_dynamics)/urdf/mav.urdf"/>
+  <arg name="model2" default="$(find flight_dynamics)/urdf/mav2.urdf"/>
+  <arg name="rvizconfig" default="$(find flight_dynamics)/rviz/mav.rviz" />
+  <rosparam command="load" file="$(find flight_dynamics)/params/params.yaml" ns="flight_dynamics" />
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <node name="sliders" pkg="rqt_ez_publisher" type="rqt_ez_publisher"/>
+  <node pkg="flight_dynamics" name="flight_dynamics" type="flight_dynamics.py" output="screen"/>
+  <node pkg="flight_dynamics" name="trim" type="trim.py" output="screen"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>
